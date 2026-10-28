@@ -17,14 +17,26 @@ function renderSlots(slots) {
     : '<span class="muted">No times left this day.</span>';
 }
 
+// Safari (iOS and macOS) has no requestIdleCallback, so fall back to a macrotask there.
+function whenIdle(cb) {
+  if (typeof window.requestIdleCallback === 'function') return window.requestIdleCallback(cb, { timeout: 500 });
+  return setTimeout(cb, 1);
+}
+
 async function loadSlots() {
   state.time = null;
-  $('slots').innerHTML = '<span class="muted">Loading times…</span>';
-  const res = await fetch(`/api/slots?store=${state.store}&day=${state.day}`);
-  const { slots } = await res.json();
-  // Render off the critical path so the date picker stays snappy on low-end phones.
-  requestIdleCallback(() => renderSlots(slots), { timeout: 500 });
   updateButton();
+  $('slots').innerHTML = '<span class="muted">Loading times…</span>';
+  try {
+    const res = await fetch(`/api/slots?store=${state.store}&day=${state.day}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const { slots } = await res.json();
+    // Render off the critical path so the date picker stays snappy on low-end phones.
+    whenIdle(() => renderSlots(slots));
+  } catch (err) {
+    console.error('Failed to load times', err);
+    $('slots').innerHTML = '<span class="muted">Couldn’t load times. Pick the day again to retry.</span>';
+  }
 }
 
 $('slots').addEventListener('click', (e) => {
