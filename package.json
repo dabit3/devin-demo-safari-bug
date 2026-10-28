@@ -3,15 +3,7 @@
   "version": "1.5.2",
   "private": true,
   "description": "Book an in-store gear fitting (mobile-first web app)",
-  "scripts": {
-    "start": "node server/index.js",
-    "test": "node --test"
-  },
-  "dependencies": {
-    "express": "^4.21.2"
-  },
-  "devDependencies": {
-    "jsdom": "^25.0.1",
-    "supertest": "^7.0.0"
-  }
+  "scripts": { "start": "node server/index.js", "test": "node --test" },
+  "dependencies": { "express": "^4.21.2" },
+  "devDependencies": { "jsdom": "^25.0.1", "supertest": "^7.0.0" }
 }
